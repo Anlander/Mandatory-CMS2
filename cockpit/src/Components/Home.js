@@ -6,6 +6,8 @@ import {Link} from "react-router-dom";
 import './style.css';
 import axios from 'axios';
 
+let API = 'http://localhost:8080/';
+
 
 
 export default class Forum extends React.Component {
@@ -16,8 +18,11 @@ export default class Forum extends React.Component {
       entries: [],
       Article:[],
       currentPage: 0,
-      perPage: 3
+      perPage: 3,
+      term: "",
     }
+
+
 
   }
 
@@ -26,14 +31,15 @@ export default class Forum extends React.Component {
 
 
   componentDidMount() {
-    axios.get(`http://192.168.99.100:8081/api/collections/get/Article?limit=${this.state.perPage}&skip=0`)
+    axios.get(`${API}api/collections/get/Products`)
       .then(res => {
         const data = res.data;
 
-        console.log(data);
+        console.log(data.entries);
         this.setState
           ({
           data:res.data.entries,
+
         })
       })
   }
@@ -42,7 +48,7 @@ export default class Forum extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     if (prevState.currentPage !== this.state.currentPage) {
       const skip = this.state.currentPage * this.state.perPage;
-      axios.get(`http://192.168.99.100:8081/api/collections/get/Article?limit=${this.state.perPage}&skip=${skip}`)
+      axios.get(`${API}api/collections/get/Product`)
         .then(res => {
           const data = res.data;
 
@@ -56,17 +62,19 @@ export default class Forum extends React.Component {
   }
 
 
+
   render() {
-
-
     const loop = this.state.data.map(data => {
+      console.log();
       return (
         <tbody key={data._id}>
            <tr>
-            <td> <Link to={`/Article/${data._id}`} className="title">{data.Title}</Link> <br></br></td>
-            <td> <a>{data.Author.display}</a></td>
-            <td> <h3>{data.Date}</h3></td>
+            <td> <Link to={`/Product/${data._id}`} className="title">{data.Name}</Link> <br></br></td>
+            <p ><img src={`${API}`+ data.Image.path} alt="picture" className="picture" /> </p>
+            <td> <h3>{data.Price}</h3></td>
+            <button className="addtocart"> add to cart </button>
            </tr>
+
 
          </tbody>
       )
@@ -74,6 +82,7 @@ export default class Forum extends React.Component {
     })
     return (
       <div className="maindiv">
+        <input  type="text" onChange={this.handleChange} />
         <table className="main-tr">
           {loop}
         </table>
